@@ -8,32 +8,33 @@ const mockContactApi = () => new Promise((resolve) => { setTimeout(resolve, 1000
 
 const Form = ({ onSuccess, onError }) => {
   const [sending, setSending] = useState(false);
-  const [emptyFields, setEmptyFields] = useState([]); // Estado para mantener un seguimiento de los campos vacíos
+  const [emptyFields, setEmptyFields] = useState([]); // Estado para mantener un seguimiento de los campos vacíos // regarder 
   
   const sendContact = useCallback(
+   
+
     async (evt) => {
       evt.preventDefault();
+           
 
       // Validar los campos antes de enviar
       const formElements = evt.target.elements;
       const emptyFieldsArray = [];
-
+     
+      
       for (let i = 0; i < formElements.length; i+=1) {
         const element = formElements[i];
         if ((element.tagName === "INPUT" || element.tagName === "TEXTAREA" || element.tagName === "SELECT") && !element.value.trim()) {
           // Si el campo está vacío, marcarlo con la clase de error y agregarlo al array de campos vacíos
           emptyFieldsArray.push(element.name);
           element.classList.add("input_error");
+          
         }
       }
 
       setEmptyFields(emptyFieldsArray); // Actualizar el estado con los campos vacíos
-
-      // Si hay campos vacíos, no enviar el formulario
-      if (emptyFieldsArray.length > 0) {
-        return;
-      }
-
+      console.log(emptyFieldsArray && emptyFieldsArray)
+      
       try {
         setSending(true); // Indicar que se está enviando
         await mockContactApi();
@@ -75,7 +76,7 @@ const Form = ({ onSuccess, onError }) => {
             name="message"
             type={FIELD_TYPES.TEXTAREA}
           />
-        <Button type={BUTTON_TYPES.SUBMIT} disabled={sending} openModal={onSuccess} hasEmptyFields={emptyFields.length > 0}>          
+        <Button type={BUTTON_TYPES.SUBMIT} disabled={sending} openModal={onSuccess} NoEmptyFields={emptyFields.length > 0}>          
             {sending ? "En cours" : "Envoyer"}
         </Button>
 

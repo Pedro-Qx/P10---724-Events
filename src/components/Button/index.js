@@ -6,21 +6,19 @@ import "./style.scss";
    onClick: () => null
     type: 1 ou 2
     title:contact
-    disabled: false.
+    disabled: !sending/ no hace el submit.
+    NoEmptyFields: emptyFields.length > 0
 */
-
-
-
 
 export const BUTTON_TYPES = { // objet avec 2 constantes: defalut et submit. quand on utilise 1 c'est default quand on utilise 2 c'es submit.
   DEFAULT: 1, // debug: DEFAULT: 1,
   SUBMIT: 2,
 };
 
-const Button = ({ title, onClick, type, disabled, children, openModal, hasEmptyFields }) => {
+const Button = ({ title, onClick, type, disabled, children, openModal, NoEmptyFields }) => {
  
-  switch (type) {                   // si type a une valeur 1 c'est le bouton default qui se montre/ s'il a une valeur 2 c'est submit.
-    case BUTTON_TYPES.DEFAULT: // débug: case BUTTON_TYPES.DEFAULT: //
+  switch (type) { // si type a une valeur 1 c'est le bouton default qui se montre/ s'il a une valeur 2 c'est submit.
+    case BUTTON_TYPES.DEFAULT:
       return (
         <button
           type="button"
@@ -36,11 +34,11 @@ const Button = ({ title, onClick, type, disabled, children, openModal, hasEmptyF
     case BUTTON_TYPES.SUBMIT:
       return (
         <button /* debug: <input> */ 
-          disabled={disabled}
+          disabled={NoEmptyFields ? !disabled : disabled}
           className="Button"
           type="submit"
           data-testid="button-test-id"
-          onClick={hasEmptyFields ? null : openModal} // débug onClick={onClick}
+          onClick={NoEmptyFields ? openModal : onClick} // débug onClick={onClick} openModal
           title={title}
         >
           {children}
@@ -70,7 +68,7 @@ Button.propTypes = {
   disabled: PropTypes.bool,
   children: PropTypes.node,
   openModal: PropTypes.func,
-  hasEmptyFields: PropTypes.bool,
+  NoEmptyFields: PropTypes.bool,
 };
 Button.defaultProps = {
   disabled: false,
@@ -79,7 +77,7 @@ Button.defaultProps = {
   title: "",
   children: null,
   openModal: null,
-  hasEmptyFields: null,
+  NoEmptyFields: null,
 }
 
 export default Button;

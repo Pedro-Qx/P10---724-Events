@@ -10,15 +10,22 @@ export const FIELD_TYPES = {
 const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder }) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState(false);
-
+  const [completed, setCompleted] = useState(false);
+  console.log(value);
+  
   const handleChange = (event) => {
     setValue(event.target.value);
     setError(false); // Al cambiar el valor, reiniciamos el estado de error
+    if (completed) {
+      setCompleted(false);
+    }
   };
 
   const handleBlur = () => {
     if (!value.trim()) {
       setError(true);
+    } else {
+      setCompleted(true); // Marcar como completado cuando el campo no está vacío
     }
   };
 
