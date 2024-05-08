@@ -15,8 +15,7 @@ export const BUTTON_TYPES = { // objet avec 2 constantes: defalut et submit. qua
   SUBMIT: 2,
 };
 
-const Button = ({ title, onClick, type, disabled, children, openModal, NoEmptyFields }) => {
- 
+const Button = ({ title, onClick, type, disabled, children, openModal, formValues }) => {
   switch (type) { // si type a une valeur 1 c'est le bouton default qui se montre/ s'il a une valeur 2 c'est submit.
     case BUTTON_TYPES.DEFAULT:
       return (
@@ -33,16 +32,29 @@ const Button = ({ title, onClick, type, disabled, children, openModal, NoEmptyFi
       );
     case BUTTON_TYPES.SUBMIT:
       return (
+        formValues === "" ? (
         <button /* debug: <input> */ 
-          disabled={NoEmptyFields ? !disabled : disabled}
+          disabled={!disabled}
           className="Button"
           type="submit"
           data-testid="button-test-id"
-          onClick={NoEmptyFields ? openModal : onClick} // débug onClick={onClick} openModal
+          onClick={openModal} // débug onClick={onClick} openModal
           title={title}
         >
           {children}
         </button>
+      ):(
+        <button /* debug: <input> */ 
+        disabled={disabled}
+        className="Button"
+        type="submit"
+        data-testid="button-test-id"
+        onClick={openModal} // débug onClick={onClick} openModal
+        title={title}
+      >
+        {children}
+      </button>
+      )
       );
     default:
       return (
@@ -68,7 +80,7 @@ Button.propTypes = {
   disabled: PropTypes.bool,
   children: PropTypes.node,
   openModal: PropTypes.func,
-  NoEmptyFields: PropTypes.bool,
+  formValues: PropTypes.string,
 };
 Button.defaultProps = {
   disabled: false,
@@ -77,7 +89,7 @@ Button.defaultProps = {
   title: "",
   children: null,
   openModal: null,
-  NoEmptyFields: null,
+  formValues: "",
 }
 
 export default Button;

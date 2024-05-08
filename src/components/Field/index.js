@@ -7,26 +7,29 @@ export const FIELD_TYPES = {
   TEXTAREA: 2,
 };
 
-const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder }) => {
-  const [value, setValue] = useState("");
+const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder, onValueChange }) => {
   const [error, setError] = useState(false);
   const [completed, setCompleted] = useState(false);
-  console.log(value);
-  
+      
   const handleChange = (event) => {
-    setValue(event.target.value);
-    setError(false); // Al cambiar el valor, reiniciamos el estado de error
-    if (completed) {
-      setCompleted(false);
+    const inputValue = event.target.value;
+    onValueChange(inputValue);
+    if (inputValue === "" && !completed){
+    setError(true);
+    }else {
+      setError(false);
+      setCompleted(true);
     }
-  };
+  };   
 
-  const handleBlur = () => {
-    if (!value.trim()) {
+  const handleBlur = (event) => {
+    const inputValue = event.target.value;
+    onValueChange(inputValue);
+    if ( inputValue === "" && !completed) {
       setError(true);
     } else {
-      setCompleted(true); // Marcar como completado cuando el campo no está vacío
-    }
+      setCompleted(true);
+    } 
   };
 
   const inputClasses = error ? "input_error" : "input";
@@ -38,7 +41,6 @@ const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder }) => {
       type="text"
       name={name}
       placeholder={placeholder}
-      value={value}
       onChange={handleChange}
       onBlur={handleBlur}
       className={inputClasses}
@@ -48,7 +50,6 @@ const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder }) => {
     <textarea
       name={name}
       placeholder={placeholder}
-      value={value}
       onChange={handleChange}
       onBlur={handleBlur}
       className={textareaClasses}
@@ -57,26 +58,26 @@ const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder }) => {
   );
 
   return (
-    error ? (
+   error ? ( 
     <div className="inputField">
       <span>{`${label} ${errorMssg}`}</span>
       {component}
     </div>
-    ):(
-      <div className="inputField">
+  ):(
+    <div className="inputField">
       <span>{label}</span>
       {component}
     </div>
-    )
+  )
   );
 };
-
 
 Field.propTypes = {
   type: PropTypes.oneOf(Object.values(FIELD_TYPES)),
   name: PropTypes.string,
   label: PropTypes.string,
   placeholder: PropTypes.string,
+  onValueChange: PropTypes.func, // Nueva prop para manejar el cambio de valor
 };
 
 Field.defaultProps = {
@@ -84,6 +85,7 @@ Field.defaultProps = {
   placeholder: "",
   type: FIELD_TYPES.INPUT_TEXT,
   name: "field-name",
+  onValueChange:()=> null,
 };
 
 export default Field;

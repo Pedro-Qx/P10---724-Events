@@ -1,40 +1,23 @@
 import { useCallback, useState } from "react";
 import PropTypes from "prop-types";
-import Field, { FIELD_TYPES } from "../../components/Field";
 import Select from "../../components/Select";
 import Button, { BUTTON_TYPES } from "../../components/Button";
+import Field, { FIELD_TYPES } from "../../components/Field";
 
 const mockContactApi = () => new Promise((resolve) => { setTimeout(resolve, 1000); });
 
-const Form = ({ onSuccess, onError }) => {
+const Form = ({ onSuccess, onError}) => {
   const [sending, setSending] = useState(false);
-  const [emptyFields, setEmptyFields] = useState([]); // Estado para mantener un seguimiento de los campos vacíos // regarder 
+  const [inputValue, setInputValue] = useState("");
+  
+  const handleInputChange = (value) =>{
+    setInputValue(value);
+  };
   
   const sendContact = useCallback(
-   
-
-    async (evt) => {
+   async (evt) => {
       evt.preventDefault();
-           
-
-      // Validar los campos antes de enviar
-      const formElements = evt.target.elements;
-      const emptyFieldsArray = [];
-     
-      
-      for (let i = 0; i < formElements.length; i+=1) {
-        const element = formElements[i];
-        if ((element.tagName === "INPUT" || element.tagName === "TEXTAREA" || element.tagName === "SELECT") && !element.value.trim()) {
-          // Si el campo está vacío, marcarlo con la clase de error y agregarlo al array de campos vacíos
-          emptyFieldsArray.push(element.name);
-          element.classList.add("input_error");
-          
-        }
-      }
-
-      setEmptyFields(emptyFieldsArray); // Actualizar el estado con los campos vacíos
-      console.log(emptyFieldsArray && emptyFieldsArray)
-      
+  
       try {
         setSending(true); // Indicar que se está enviando
         await mockContactApi();
@@ -45,38 +28,46 @@ const Form = ({ onSuccess, onError }) => {
         onError(err); // Llamar a la función onError si hay un error
       }
     },
-    [onSuccess, onError]
+    [onSuccess, onError, inputValue]
+    
   );
-
+  console.log(inputValue && inputValue);
   return (
     <form onSubmit={sendContact}>
       <div className="row">
         <div className="col">
-          <Field placeholder="" 
-            label={emptyFields.includes("nom") ? "Nom (Veuillez compléter ce champ)" : "Nom"}
-            name="nom" /> 
-          <Field placeholder=""
-            label={emptyFields.includes("prenom") ? "Prénom (Veuillez compléter ce champ)" : "Prénom"}
-            name="prenom" />
+          <Field 
+            label="Nom"
+            name="nom" 
+            onValueChange={handleInputChange}
+            /> 
+          <Field 
+            label="Prénom"
+            name="prenom" 
+            onValueChange={handleInputChange}
+            />
           <Select
             selection={["Personel", "Entreprise"]}
             onChange={() => null}
-            label={emptyFields.includes("selection") ? "Personel / Entreprise (Veillez compléter ce champ)" : "Personel / Entreprise"}
+            label="Personel / Entreprise"
             type="large"
             titleEmpty
           />
-          <Field placeholder="" 
-            label={emptyFields.includes("email") ? "Email (Veuillez compléter ce champ)" : "Email"} 
-            name="email" />
+          <Field 
+            label="Email" 
+            name="email" 
+            onValueChange={handleInputChange}
+            />
         </div>
         <div className="col">
           <Field
-            placeholder="message"
-            label={emptyFields.includes("message") ? "Message (Veuillez compléter ce champ)" : "Message"}
-            name="message"
             type={FIELD_TYPES.TEXTAREA}
+            placeholder="message"
+            label="Message"
+            name="message"
+            onValueChange={handleInputChange}
           />
-        <Button type={BUTTON_TYPES.SUBMIT} disabled={sending} openModal={onSuccess} NoEmptyFields={emptyFields.length > 0}>          
+        <Button type={BUTTON_TYPES.SUBMIT} disabled={sending} openModal={onSuccess}  formValues={inputValue}/* {emptyFields.length > 0} */ >        
             {sending ? "En cours" : "Envoyer"}
         </Button>
 
