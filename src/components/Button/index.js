@@ -32,7 +32,7 @@ const Button = ({ title, onClick, type, disabled, children, openModal, formValue
       );
     case BUTTON_TYPES.SUBMIT:
       return (
-        formValues === "" ? (
+        formValues === false ? (
         <button /* debug: <input> */ 
           disabled={!disabled}
           className="Button"
@@ -80,7 +80,7 @@ Button.propTypes = {
   disabled: PropTypes.bool,
   children: PropTypes.node,
   openModal: PropTypes.func,
-  formValues: PropTypes.string,
+  formValues: PropTypes.bool,
 };
 Button.defaultProps = {
   disabled: false,
@@ -89,7 +89,7 @@ Button.defaultProps = {
   title: "",
   children: null,
   openModal: null,
-  formValues: "",
+  formValues: false,
 }
 
 export default Button;

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Select from "../../components/Select";
 import Button, { BUTTON_TYPES } from "../../components/Button";
@@ -8,10 +8,27 @@ const mockContactApi = () => new Promise((resolve) => { setTimeout(resolve, 1000
 
 const Form = ({ onSuccess, onError}) => {
   const [sending, setSending] = useState(false);
-  const [inputValue, setInputValue] = useState("");
   
-  const handleInputChange = (value) =>{
-    setInputValue(value);
+  const [formValues, setFormValues] = useState({
+    nom: "",
+    prénom: "",
+    selectValue: "",
+    email: "",
+    message: ""
+  });
+  const [formCompleted, setFormCompleted] = useState(false);
+  
+  useEffect (()=>{
+    
+    const isFormCompleted = Object.values(formValues).every((val) => val !== "");
+    setFormCompleted(isFormCompleted);    
+  }, [formValues]);
+ 
+    const handleInputChange = (name, value) => {
+      setFormValues((prevFormValues) => ({
+      ...prevFormValues,
+      [name]: value
+    }));
   };
   
   const sendContact = useCallback(
@@ -28,10 +45,9 @@ const Form = ({ onSuccess, onError}) => {
         onError(err); // Llamar a la función onError si hay un error
       }
     },
-    [onSuccess, onError, inputValue]
-    
+    [onSuccess, onError, formValues ]  // inputValue //
   );
-  console.log(inputValue && inputValue);
+ 
   return (
     <form onSubmit={sendContact}>
       <div className="row">
@@ -39,25 +55,28 @@ const Form = ({ onSuccess, onError}) => {
           <Field 
             label="Nom"
             name="nom" 
-            onValueChange={handleInputChange}
+            onValueChange={(value)=> handleInputChange("nom", value)}
             /> 
           <Field 
             label="Prénom"
             name="prenom" 
-            onValueChange={handleInputChange}
+            onValueChange={(value)=> handleInputChange("prénom", value)}
             />
           <Select
             selection={["Personel", "Entreprise"]}
-            onChange={() => null}
+            onChange={(value) => handleInputChange("selectValue", value)} // onChange={() => null}
             label="Personel / Entreprise"
             type="large"
             titleEmpty
+            
           />
           <Field 
+            type={FIELD_TYPES.EMAIL}
             label="Email" 
             name="email" 
-            onValueChange={handleInputChange}
-            />
+            onValueChange={(value) => handleInputChange("email", value)}
+          />
+            
         </div>
         <div className="col">
           <Field
@@ -65,9 +84,9 @@ const Form = ({ onSuccess, onError}) => {
             placeholder="message"
             label="Message"
             name="message"
-            onValueChange={handleInputChange}
+            onValueChange={(value) => handleInputChange("message", value)}
           />
-        <Button type={BUTTON_TYPES.SUBMIT} disabled={sending} openModal={onSuccess}  formValues={inputValue}/* {emptyFields.length > 0} */ >        
+        <Button type={BUTTON_TYPES.SUBMIT} disabled={sending} openModal={onSuccess}  formValues={formCompleted}> 
             {sending ? "En cours" : "Envoyer"}
         </Button>
 

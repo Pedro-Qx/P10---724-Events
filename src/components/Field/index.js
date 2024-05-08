@@ -12,8 +12,11 @@ const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder, onValu
   const [completed, setCompleted] = useState(false);
       
   const handleChange = (event) => {
-    const inputValue = event.target.value;
+    // Si el campo es de correo electrónico, convertir el valor a minúsculas
+    const inputValue = type === FIELD_TYPES.EMAIL ? event.target.value.toLowerCase() : event.target.value;
+    // Llamar a la función proporcionada por el componente padre
     onValueChange(inputValue);
+        
     if (inputValue === "" && !completed){
     setError(true);
     }else {
@@ -45,6 +48,7 @@ const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder, onValu
       onBlur={handleBlur}
       className={inputClasses}
       data-testid="field-testid"
+      autoCapitalize={type === FIELD_TYPES.EMAIL ? "none" : "sentences"}
     />
   ) : (
     <textarea
