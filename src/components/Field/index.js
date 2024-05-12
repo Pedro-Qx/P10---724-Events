@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import PropTypes from "prop-types";
+
 import "./style.scss";
 
 export const FIELD_TYPES = {
@@ -7,72 +7,37 @@ export const FIELD_TYPES = {
   TEXTAREA: 2,
 };
 
-const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder, onValueChange }) => {
-  const [error, setError] = useState(false);
-  const [completed, setCompleted] = useState(false);
-      
-  const handleChange = (event) => {
-    // Si el campo es de correo electrónico, convertir el valor a minúsculas
-    const inputValue = type === FIELD_TYPES.EMAIL ? event.target.value.toLowerCase() : event.target.value;
-    // Llamar a la función proporcionada por el componente padre
-    onValueChange(inputValue);
-        
-    if (inputValue === "" && !completed){
-    setError(true);
-    }else {
-      setError(false);
-      setCompleted(true);
-    }
-  };   
-
-  const handleBlur = (event) => {
-    const inputValue = event.target.value;
-    onValueChange(inputValue);
-    if ( inputValue === "" && !completed) {
-      setError(true);
-    } else {
-      setCompleted(true);
-    } 
-  };
-
-  const inputClasses = error ? "input_error" : "input";
-  const textareaClasses = error ? "textarea_error" : "textarea";
-  const errorMssg = "(Veillez compléter ce champ)";
-
-  const component = type === FIELD_TYPES.INPUT_TEXT ? (
-    <input
-      type="text"
-      name={name}
-      placeholder={placeholder}
-      onChange={handleChange}
-      onBlur={handleBlur}
-      className={inputClasses}
-      data-testid="field-testid"
-      autoCapitalize={type === FIELD_TYPES.EMAIL ? "none" : "sentences"}
-    />
-  ) : (
-    <textarea
-      name={name}
-      placeholder={placeholder}
-      onChange={handleChange}
-      onBlur={handleBlur}
-      className={textareaClasses}
-      data-testid="field-testid"
-    />
-  );
-
+const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder }) => {
+  let component;
+  switch (type) {
+    case FIELD_TYPES.INPUT_TEXT:
+      component = (
+        <input
+          type="text"
+          name={name}
+          placeholder={placeholder}
+          data-testid="field-testid"
+        />
+      );
+      break;
+    case FIELD_TYPES.TEXTAREA:
+      component = <textarea name={name} data-testid="field-testid" />;
+      break;
+    default:
+      component = (
+        <input
+          type="text"
+          name={name}
+          placeholder={placeholder}
+          data-testid="field-testid"
+        />
+      );
+  }
   return (
-   error ? ( 
-    <div className="inputField">
-      <span>{`${label} ${errorMssg}`}</span>
-      {component}
-    </div>
-  ):(
     <div className="inputField">
       <span>{label}</span>
       {component}
     </div>
-  )
   );
 };
 
@@ -81,15 +46,12 @@ Field.propTypes = {
   name: PropTypes.string,
   label: PropTypes.string,
   placeholder: PropTypes.string,
-  onValueChange: PropTypes.func, // Nueva prop para manejar el cambio de valor
 };
-
-Field.defaultProps = {
-  label: "",
-  placeholder: "",
-  type: FIELD_TYPES.INPUT_TEXT,
-  name: "field-name",
-  onValueChange:()=> null,
-};
+ Field.defaultProps = {
+   label: "",
+   placeholder: "",
+   type: FIELD_TYPES.INPUT_TEXT,
+   name: "field-name",
+ }
 
 export default Field;
