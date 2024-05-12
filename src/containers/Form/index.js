@@ -4,11 +4,10 @@ import Select from "../../components/Select";
 import Button, { BUTTON_TYPES } from "../../components/Button";
 import Field, { FIELD_TYPES } from "../../components/Field";
 
-const mockContactApi = () => new Promise((resolve) => { setTimeout(resolve, 1000); });
+const mockContactApi = () => new Promise((resolve) => { setTimeout(resolve, 2000); });
 
 const Form = ({ onSuccess, onError}) => {
   const [sending, setSending] = useState(false);
-  
   const [formValues, setFormValues] = useState({
     nom: "",
     prénom: "",
@@ -16,15 +15,20 @@ const Form = ({ onSuccess, onError}) => {
     email: "",
     message: ""
   });
-  const [formCompleted, setFormCompleted] = useState(false);
+  const [formCompleted, setFormCompleted] = useState(false); 
+  const [clicked, setClicked] = useState(false);
   
-  useEffect (()=>{
-    
-    const isFormCompleted = Object.values(formValues).every((val) => val !== "");
+  const handleButtonClick = () => { 
+    setClicked(!clicked);
+  };
+
+  useEffect (()=>{ // verifie que les champs soient complété.
+    const isFormCompleted = Object.values(formValues).every((val) => val !== ""); 
     setFormCompleted(isFormCompleted);    
   }, [formValues]);
  
-    const handleInputChange = (name, value) => {
+  
+  const handleInputChange = (name, value) => { //valeurs que chaque formulaire (name) affiche. 
       setFormValues((prevFormValues) => ({
       ...prevFormValues,
       [name]: value
@@ -40,43 +44,47 @@ const Form = ({ onSuccess, onError}) => {
         await mockContactApi();
         setSending(false);
         onSuccess(); // Llamar a la función onSuccess si la llamada es exitosa
+                        
       } catch (err) {
         setSending(false);
         onError(err); // Llamar a la función onError si hay un error
       }
     },
-    [onSuccess, onError, formValues ]  // inputValue //
+    [onSuccess, onError] // onSuccess: la modale s'ouvre  //
   );
- 
+
+    
   return (
-    <form onSubmit={sendContact}>
+    <form onSubmit={sendContact}> { /* appelle la fonction mockContactApi */ }
       <div className="row">
         <div className="col">
           <Field 
             label="Nom"
             name="nom" 
             onValueChange={(value)=> handleInputChange("nom", value)}
+            clear={clicked}
             /> 
           <Field 
             label="Prénom"
-            name="prenom" 
+            name="prénom" 
             onValueChange={(value)=> handleInputChange("prénom", value)}
-            />
+            clear={clicked}
+          />
           <Select
             selection={["Personel", "Entreprise"]}
             onChange={(value) => handleInputChange("selectValue", value)} // onChange={() => null}
             label="Personel / Entreprise"
             type="large"
             titleEmpty
-            
+            clear={clicked}           
           />
           <Field 
-            type={FIELD_TYPES.EMAIL}
             label="Email" 
             name="email" 
             onValueChange={(value) => handleInputChange("email", value)}
+            isEmail
+            clear={clicked}
           />
-            
         </div>
         <div className="col">
           <Field
@@ -85,8 +93,15 @@ const Form = ({ onSuccess, onError}) => {
             label="Message"
             name="message"
             onValueChange={(value) => handleInputChange("message", value)}
+            clear={clicked}
           />
-        <Button type={BUTTON_TYPES.SUBMIT} disabled={sending} openModal={onSuccess}  formValues={formCompleted}> 
+        <Button 
+          type={BUTTON_TYPES.SUBMIT} 
+          disabled={sending} 
+          openModal={onSuccess} 
+          formValues={formCompleted} 
+          onClickSend={handleButtonClick}
+          > 
             {sending ? "En cours" : "Envoyer"}
         </Button>
 

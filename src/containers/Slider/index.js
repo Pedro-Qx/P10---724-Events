@@ -17,7 +17,7 @@ const Slider = () => {
     );
   };
   
-  useEffect(() => { // déclanche la fonction next card mais, il n'y a pas des dépendances... c'est bizarre)
+  useEffect(() => { 
     nextCard();
   });
   

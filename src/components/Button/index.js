@@ -1,27 +1,39 @@
 import PropTypes from "prop-types"; // ceci valide les props qui se passent avec react
-
 import "./style.scss";
+import { useState } from "react";
 
-/* onClick: () => window.document.location.hash = "#contact" 
+/* Props ****
+
+  onClick: () => window.document.location.hash = "#contact" 
    onClick: () => null
     type: 1 ou 2
     title:contact
     disabled: !sending/ no hace el submit.
-    NoEmptyFields: emptyFields.length > 0
 */
 
 export const BUTTON_TYPES = { // objet avec 2 constantes: defalut et submit. quand on utilise 1 c'est default quand on utilise 2 c'es submit.
-  DEFAULT: 1, // debug: DEFAULT: 1,
+  DEFAULT: 1, 
   SUBMIT: 2,
 };
 
-const Button = ({ title, onClick, type, disabled, children, openModal, formValues }) => {
+const Button = ({ title, onClick, type, disabled, children, openModal, formValues, onClickSend}) => {
+  // state et fonction qui contrôlent le click sur le bouton submit et envoie en props une valeur false ou true.
+  const [clicked, setClicked] = useState(false);
+  const handleOnClick = (event) => {
+    if (!clicked && openModal) {
+      setClicked(true);
+      openModal();
+      onClickSend(true);
+       }
+    // Afin d'éviter que le formulaire s'envoie deux fois.
+    event.stopPropagation();
+  };
+
   switch (type) { // si type a une valeur 1 c'est le bouton default qui se montre/ s'il a une valeur 2 c'est submit.
     case BUTTON_TYPES.DEFAULT:
       return (
         <button
           type="button"
-          disabled={disabled}
           className="Button"
           data-testid="button-test-id"
           onClick={onClick}
@@ -32,29 +44,20 @@ const Button = ({ title, onClick, type, disabled, children, openModal, formValue
       );
     case BUTTON_TYPES.SUBMIT:
       return (
-        formValues === false ? (
         <button /* debug: <input> */ 
-          disabled={!disabled}
+          // formValues a une valeur true si tout les formulaires ont étaient remplis.
+          disabled={!formValues ? !disabled : disabled} 
           className="Button"
           type="submit"
           data-testid="button-test-id"
-          onClick={openModal} // débug onClick={onClick} openModal
+          /* OnClickSend est une prop qui vient du composant form. Lorsque je fais click, 
+          la modale s'ouvre et le state s'actualise à true. form transmet ceci à field 
+          pour pouvoir effacer les champs une fois que le formulaire est envoyé. */
+          onClick={onClickSend ? handleOnClick : null}
           title={title}
         >
           {children}
         </button>
-      ):(
-        <button /* debug: <input> */ 
-        disabled={disabled}
-        className="Button"
-        type="submit"
-        data-testid="button-test-id"
-        onClick={openModal} // débug onClick={onClick} openModal
-        title={title}
-      >
-        {children}
-      </button>
-      )
       );
     default:
       return (
@@ -81,6 +84,7 @@ Button.propTypes = {
   children: PropTypes.node,
   openModal: PropTypes.func,
   formValues: PropTypes.bool,
+  onClickSend: PropTypes.func,
 };
 Button.defaultProps = {
   disabled: false,
@@ -90,6 +94,7 @@ Button.defaultProps = {
   children: null,
   openModal: null,
   formValues: false,
+  onClickSend: ()=> null,
 }
 
 export default Button;

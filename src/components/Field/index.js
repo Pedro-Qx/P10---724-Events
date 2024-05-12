@@ -1,41 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import "./style.scss";
 
 export const FIELD_TYPES = {
   INPUT_TEXT: 1,
   TEXTAREA: 2,
+  EMAIL: 3,
 };
 
-const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder, onValueChange }) => {
-  const [error, setError] = useState(false);
-  const [completed, setCompleted] = useState(false);
-      
+const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder, onValueChange, isEmail, clear }) => {
+  const [error, setError] = useState(false); // si les champs ne sont pas remplis.
+  const [completed, setCompleted] = useState(false); // si tous les champs sont bien remplis.
+  const [fieldValue, setFieldValue] = useState("");
+
+  /* Ce useEffect permet de vider les champs. clear est une prop qui vient de button 
+  et qui a une valeur true lorsque je fais click sur submit */
+  useEffect(() => {
+    if (clear) {
+      setFieldValue(""); 
+      setCompleted(false);
+    }
+  }, [clear]);
+  
+  /* cette fonction verifie si les champs sont remplis ou pas. 
+  Si non elle donne la valeur true au state error */
   const handleChange = (event) => {
-    // Si el campo es de correo electrónico, convertir el valor a minúsculas
-    const inputValue = type === FIELD_TYPES.EMAIL ? event.target.value.toLowerCase() : event.target.value;
-    // Llamar a la función proporcionada por el componente padre
-    onValueChange(inputValue);
-        
-    if (inputValue === "" && !completed){
-    setError(true);
-    }else {
+    const inputValue = event.target.value; 
+    setFieldValue(inputValue); 
+    onValueChange(inputValue); 
+      if (inputValue === "" && !completed) {
+      setError(true);
+    } else {
       setError(false);
       setCompleted(true);
     }
-  };   
-
-  const handleBlur = (event) => {
-    const inputValue = event.target.value;
-    onValueChange(inputValue);
-    if ( inputValue === "" && !completed) {
-      setError(true);
-    } else {
-      setCompleted(true);
-    } 
   };
-
+  /* ces variables permette de changer de style et afficher un message d'erreur quand les champs en sont pas remplis */
   const inputClasses = error ? "input_error" : "input";
+  const inputClassEmail = error ? "input_error" : "input_email";
   const textareaClasses = error ? "textarea_error" : "textarea";
   const errorMssg = "(Veillez compléter ce champ)";
 
@@ -44,35 +46,36 @@ const Field = ({ type = FIELD_TYPES.INPUT_TEXT, label, name, placeholder, onValu
       type="text"
       name={name}
       placeholder={placeholder}
+      value={fieldValue}
       onChange={handleChange}
-      onBlur={handleBlur}
-      className={inputClasses}
+      onBlur={handleChange}
+      className={isEmail ? inputClassEmail : inputClasses}
       data-testid="field-testid"
-      autoCapitalize={type === FIELD_TYPES.EMAIL ? "none" : "sentences"}
     />
   ) : (
     <textarea
       name={name}
       placeholder={placeholder}
+      value={fieldValue}
       onChange={handleChange}
-      onBlur={handleBlur}
+      onBlur={handleChange}
       className={textareaClasses}
       data-testid="field-testid"
     />
   );
 
   return (
-   error ? ( 
-    <div className="inputField">
-      <span>{`${label} ${errorMssg}`}</span>
-      {component}
-    </div>
-  ):(
-    <div className="inputField">
-      <span>{label}</span>
-      {component}
-    </div>
-  )
+    error ? (
+      <div className="inputField">
+        <span>{`${label} ${errorMssg}`}</span>
+        {component}
+      </div>
+    ) : (
+      <div className="inputField">
+        <span>{label}</span>
+        {component}
+      </div>
+    )
   );
 };
 
@@ -81,7 +84,9 @@ Field.propTypes = {
   name: PropTypes.string,
   label: PropTypes.string,
   placeholder: PropTypes.string,
-  onValueChange: PropTypes.func, // Nueva prop para manejar el cambio de valor
+  onValueChange: PropTypes.func,
+  isEmail: PropTypes.bool,
+  clear: PropTypes.bool,
 };
 
 Field.defaultProps = {
@@ -89,7 +94,9 @@ Field.defaultProps = {
   placeholder: "",
   type: FIELD_TYPES.INPUT_TEXT,
   name: "field-name",
-  onValueChange:()=> null,
+  onValueChange: () => null,
+  isEmail: false,
+  clear: false,
 };
 
 export default Field;

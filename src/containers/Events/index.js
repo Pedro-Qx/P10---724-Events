@@ -7,7 +7,7 @@ import ModalEvent from "../ModalEvent";
 
 import "./style.css";
 
-const PER_PAGE = 9;  // cantidad de eventos por página / el sitio parace estar en la página 12 // 
+const PER_PAGE = 9;  // quantité d'événements sur une page // 
 
 const EventList = () => {
   const { data, error } = useData();
@@ -16,22 +16,24 @@ const EventList = () => {
  
     const filteredEvents = (
     (!type
-      ? data?.events  // si type da false (no hay ningún tipo de evento seleccionado) muestra todos los datos. // 
-      : data?.events.filter((event) => event.type === type)) || []// acá habría que mostrar los eventos seleccionados. sintaxis dada : : data?.events) || [] //
+      ? data?.events  // si type est false (pas d'événemnt séléctionné) toutes les données s'affichent. // 
+      : data?.events.filter((event) => event.type === type)) || [] // débug: data?.events) || [] . Je filtre les événements.//
   ).filter((event, index) => {
     if (
-      (currentPage - 1) * PER_PAGE <= index && // verifica si el índice del elemento es mayor o igual al índice del primer elemento que debería mostrarse en la página actual, y la expresión //
-      PER_PAGE * currentPage > index // verifica si el índice del elemento es menor que el índice del último elemento que debería mostrarse en la página actual. //
+      (currentPage - 1) * PER_PAGE <= index && // Vérifie si l'index de l'événement est supérieur ou égal au premier événement de la page actuelle.
+      PER_PAGE * currentPage > index // Vérifie si l'index de l'événement est inférieur à l'index du dernier événement de la page actuelle.
+
+
     ) {
-      return true; // Si ambas condiciones son verdaderas, significa que el elemento event debería mostrarse en la página actual, por lo que la función de filtro devuelve true, //
+      return true; // Si les deux conditions ci-dessus sont remplies, l'événement est conservé 
     }
-    return false;
+    return false; // si non il est filtré.
   });
   
   
-  const changeType = (evtType) => { // nuevo evento que se selecciona // debería poner acá el valor del onChange //
-    setCurrentPage(1); // después de cambiar el tipo de evento, la lista de eventos volverá a comenzar desde la primera página. //
-    setType(evtType); // Esto cambia el tipo de evento seleccionado, lo que probablemente afectará a la lista de eventos que se muestran en la página. //
+  const changeType = (evtType) => { 
+    setCurrentPage(1); // après avoir changé le type d'événement, la liste d'événts commençara depuis la première page. //
+    setType(evtType); // ceci change le type d'événement séléctionné pour activer le filtre d'événements. //
   };
 
   const pageNumber = Math.floor((filteredEvents?.length || 0) / PER_PAGE) + 1; // número de página > redondea hacia abajo el resultado de la división entre el número de eventos por páginas (9) y el número de eventos filtrados. suma uno en el caso en que la cantidad de eventos no quepan en la página.

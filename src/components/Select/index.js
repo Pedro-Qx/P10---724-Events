@@ -22,23 +22,23 @@ const Select = ({
   };
   
   return (
-    <div className={`SelectContainer ${type}`} data-testid="select-testid"> { /* sectContainer normal y data-testid es un atributo para test automatizados */}
-      {label && <div className="label">{label}</div>} { /* si personnel ou entreprise entonces <div>personel/entreprise> */ }
+    <div className={`SelectContainer ${type}`} data-testid="select-testid"> { /* sectContainer normal y data-testid concernet les tests */}
+      {label && <div className="label">{label}</div>} { /* personnel ou entreprise */ }
       <div className="Select">
         <ul>
-          <li className={collapsed ? "SelectTitle--show" : "SelectTitle--hide"}> { /* si usestate collapsed, entonces className "selectTitlte show" si no hide */ }
-            {value || (!titleEmpty && "Toutes")} { /* si value tiene un valor verdadero (que no sea false, undefined o null) muestra dicho valor en el títutlo //o si titleEmpty es true, el valor de value es null */ }
+          <li className={collapsed ? "SelectTitle--show" : "SelectTitle--hide"}> { /* si usestate collapsed, alors className "selectTitlte show" sinon hide */ }
+            {value || (!titleEmpty && "Toutes")} { /* si value, alors la valeur de value s'affiche dans le titre ou bien si titleEmpty, value est null */ }
           </li>
-          {!collapsed && ( // si collapsed está en false entonces (selectTitle pasa a hide y se abre el seleccionador) //
+          {!collapsed && ( // si collapsed est false, alors selectTitle devient hide y le menu s'ouvre) //
             <>
-              {!titleEmpty && ( // Si el título está en no-false entonces //
-                <li onClick={() => changeValue(null)}> { /* cuando se hace click, pone en null el valor de collaps y a value / acá hay un posible error con el collaps, debería ser false no null */ }
-                  <input defaultChecked={!value} name="selected" type="radio" />{" "} { /* si el valor de defaultChecked es null, este elemento estará marcado por defecto. las llaves con comillas mostrará "toutes" */ }
+              {!titleEmpty && ( // Si el titre est non-false, alors... //
+                <li onClick={() => changeValue(null)}> { /* quand on fait click, collaps devient null */ }
+                  <input defaultChecked={!value} name="selected" type="radio" />{" "} { /* si la valeur de defaultChecked est null, cet élément sera coché par défaut et dans les accolades la valeur sera "toutes" */ }
                   Toutes
                 </li>
               )}
               {selection.map((s) => (
-                <li key={s} onClick={() => changeValue(s)}> { /* se hace un map de selection y se crea un li por cada elemento. se le da el valor de cada elemento a changeValue, luego si value es igual a el elemento que actualiza change value queda seleccionado por defecto. */ }
+                <li key={s} onClick={() => changeValue(s)}> { /* on fait un map de la selection et on crée une balise li pour chaque élément de la séléction et on lui donne la valeur de chaque élément a changeValue. Après si value est égale à l'élément qui actualise change, value est séléctionné par défaut. */ }
                   <input
                     defaultChecked={value === s}
                     name="selected"
